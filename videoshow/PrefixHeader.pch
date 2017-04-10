@@ -1,0 +1,42 @@
+//
+//  VS_PrefixHeader.pch
+//  videoshow
+//
+//  Created by gutou on 2017/2/27.
+//  Copyright © 2017年 mapboo. All rights reserved.
+//
+
+#ifndef VS_PrefixHeader_pch
+#define VS_PrefixHeader_pch
+
+#import "AFNetworking.h"
+#import "RestAPI.h"
+
+
+// 0x123456
+#define UIColorFromRGB(rgbValue)[UIColor colorWithRed:((float)((rgbValue&0xFF0000)>>16))/255.0 green:((float)((rgbValue&0xFF00)>>8))/255.0 blue:((float)(rgbValue&0xFF))/255.0 alpha:1.0]
+
+// mainScreenSize
+#define MainScreenSize ([UIScreen mainScreen].bounds.size)
+
+// weakSelf
+#define WeakTypeof(WeakSelf) __weak typeof(self) WeakSelf = self;
+
+#endif 
+
+
+
+//
+#ifdef DEBUG
+
+#undef NSLog
+#define NSLog(...) NSLog(__VA_ARGS__);
+
+#else
+
+#undef NSLog
+//#define NSLog(...) {}
+
+#endif
+
+

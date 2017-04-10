@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "32c9c43a-b2ce-4165-ba7b-97356ee89f3d",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "32c9c43a-b2ce-4165-ba7b-97356ee89f3d" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "32c9c43a-b2ce-4165-ba7b-97356ee89f3d" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "492A00BD-BBB7-4588-B365-8B1ECA0AB63E",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "32c9c43a-b2ce-4165-ba7b-97356ee89f3d" : "videoshow-iOS\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Pods",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "videoshow\/Pods\/Pods.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn:\/\/gutou1012%40126.com@git.oschina.net\/mapboo\/videoshow-iOS",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "32c9c43a-b2ce-4165-ba7b-97356ee89f3d"
+    }
+  ]
+}

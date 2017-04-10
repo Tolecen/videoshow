@@ -1,0 +1,79 @@
+//
+//  VS_PrefixHeader.pch
+//  videoshow
+//
+//  Created by gutou on 2017/2/27.
+//  Copyright © 2017年 mapboo. All rights reserved.
+//
+
+#ifndef VS_PrefixHeader_pch
+#define VS_PrefixHeader_pch
+
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+
+#import "RestAPI.h"
+#import "MJRefresh.h"
+#import "Masonry.h"
+#import "SVProgressHUD.h"
+#import "UIImageView+WebCache.h"
+
+#import "AppDataManager.h"
+#import "AppAppearance.h"
+#import "AppTool.h"
+#import "UIViewExt.h"
+
+
+// 0x123456
+#define UIColorFromRGB(rgbValue)[UIColor colorWithRed:((float)((rgbValue&0xFF0000)>>16))/255.0 green:((float)((rgbValue&0xFF00)>>8))/255.0 blue:((float)(rgbValue&0xFF))/255.0 alpha:1.0]
+
+
+// mainScreenSize
+#define MainScreenSize ([UIScreen mainScreen].bounds.size)
+
+
+// weakSelf
+#define WeakTypeof(WeakSelf) __weak typeof(self) WeakSelf = self;
+
+//
+#define IOS7OrPlus ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+
+#endif 
+
+//友盟
+#define UMSocial_AppKey @"58c2258c8f4a9d249e00094d"
+//微信key
+#define WX_AppKey @"wx882019b63062d485"//小视秀
+//#define WX_AppKey @"wx53fd83f6fe7145f3"//美视秀wx_appkey
+
+#define WX_AppSecret @"wx882019b63062d485"
+
+//QQ开放平台key
+#define QQ_AppID @"1105967399"
+
+#define QQ_AppKey @"skD6gohjCH5OUpe1"
+
+//新浪开放平台key
+#define Sina_AppKey @"wx882019b63062d485"
+
+#define Sign_Salt @"WFkHndoRTcEQS8gXrp"
+
+//测试视频播放url1，url2
+#define TestPlayer_Url_1 @"http://flv2.bn.netease.com/videolib3/1608/30/zPuaL7429/SD/zPuaL7429-mobile.mp4"
+#define TestPlayer_Url_2 @"http://flv2.bn.netease.com/videolib3/1608/30/zPuaL7429/SD/zPuaL7429-mobile.mp4"
+
+
+//自定义打印
+#ifdef DEBUG
+
+#undef NSLog
+#define NSLog(...) NSLog(__VA_ARGS__);
+
+#else
+
+#undef NSLog
+//#define NSLog(...) {}
+
+#endif
+
+
