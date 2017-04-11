@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:IJKMediaPlayer/IJKMediaPlayer.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:videoshow.xcodeproj">
    </FileRef>
    <FileRef

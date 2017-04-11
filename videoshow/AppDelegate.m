@@ -20,7 +20,7 @@
 #import "UMessage.h"
 #import "WXApiManager.h"
 #import "UMMobClick/MobClick.h"
-
+#import "MagicalRecord.h"
 
 @interface AppDelegate ()<UNUserNotificationCenterDelegate>
 
@@ -35,7 +35,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
+    [MagicalRecord setupCoreDataStackWithStoreNamed:@"Model.sqlite"];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     

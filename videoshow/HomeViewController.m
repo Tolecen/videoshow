@@ -17,6 +17,7 @@
 #import "lz_VideoTemplateModel.h"
 #import "UserModel.h"
 #import "LoginModel.h"
+#import "VideoRecorderViewController.h"
 
 @interface HomeViewController ()
 
@@ -149,6 +150,10 @@
         [self HudShowWithStatus:@"请登录" Delay:1.5];
         return;
     }
+    VideoRecorderViewController *camera = [[VideoRecorderViewController alloc] init];
+    [self.navigationController pushViewController:camera animated:YES];
+//    UINavigationController *cameraNav = [[UINavigationController alloc]initWithRootViewController:camera];
+//    [self presentViewController:cameraNav animated:YES completion:nil];
 }
 - (IBAction)Action_4:(id)sender {
     NSLog(@"水印视频");
