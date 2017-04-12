@@ -98,7 +98,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2328</string>
+	<string>2360</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>wechat</string>
@@ -249,6 +249,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>请允许使用相机</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>请允许使用麦克风</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>请允许使用图库</string>
 	<key>UILaunchStoryboardName</key>

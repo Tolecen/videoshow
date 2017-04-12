@@ -395,11 +395,11 @@
 
 - (void)mergeVideoFiles
 {
-    __block VideoImportVideoViewController *blockSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
-        NSString *concatPath = [BabyFileManager getVideoMergeFilePathString:blockSelf.mMediaObject.mOutputDirectory concatText:[self.mMediaObject getConcatYUV]];
+        NSString *concatPath = [BabyFileManager getVideoMergeFilePathString:weakSelf.mMediaObject.mOutputDirectory concatText:[self.mMediaObject getConcatYUV]];
         DLog(@"concatPath : %@", concatPath);
         
         VideoEncoder *encoder = [VideoEncoder videoEncoder];
@@ -420,13 +420,13 @@
         [mutableArray addObject:@"aac_adtstoasc"];
         [mutableArray addObject:@"-movflags"];
         [mutableArray addObject:@"+faststart"];
-        [mutableArray addObject:[self.mMediaObject getOutputTempVideoPath]];
+        [mutableArray addObject:[weakSelf.mMediaObject getOutputTempVideoPath]];
         
         
         NSArray *array =[mutableArray copy];
         
         OnEncoderProgressBlock progressBlock = ^(long size, long timestamp) {
-            DLog(@"执行中：size = %ld, timestamp = %ld -> 执行进度 ：%.2f", size, timestamp, (double)timestamp / ([blockSelf.mMediaObject getDuration] * 1000));
+            DLog(@"执行中：size = %ld, timestamp = %ld -> 执行进度 ：%.2f", size, timestamp, (double)timestamp / ([weakSelf.mMediaObject getDuration] * 1000));
         };
         
         OnEncoderCompletionBlock block = ^(int ret, NSString* retString) {
@@ -434,7 +434,14 @@
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 //回调或者说是通知主线程刷新，
-                [blockSelf pushVideoPreview];
+                if (weakSelf.fromWhich==2) {
+                    [weakSelf.navigationController popViewControllerAnimated:YES];
+                    if (weakSelf.onPublish) {
+                        weakSelf.onPublish([weakSelf.mMediaObject getOutputTempVideoPath]);
+                    }
+                }
+                else
+                    [weakSelf pushVideoPreview];
                 [SVProgressHUD dismiss];
                 
             });
@@ -460,7 +467,7 @@
     
     player.onPublish = ^() {
         if (self.onPublish) {
-            self.onPublish();
+            self.onPublish(@"");
         }
         [self.navigationController popViewControllerAnimated:YES];
     };

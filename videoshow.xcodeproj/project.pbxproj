@@ -326,6 +326,9 @@
 		97E7F8161E9D0DF70057971B /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97E7F8151E9D0DF70057971B /* libstdc++.tbd */; };
 		97E7F8181E9D0DFF0057971B /* libz.1.1.3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97E7F8171E9D0DFF0057971B /* libz.1.1.3.tbd */; };
 		97E7F81A1E9D0E080057971B /* libz.1.2.5.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97E7F8191E9D0E080057971B /* libz.1.2.5.tbd */; };
+		D83722241E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D83722231E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.m */; };
+		D83722261E9DBBB8007AB5A5 /* test_264.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = D83722251E9DBBB8007AB5A5 /* test_264.mp4 */; };
+		D837222D1E9E12E8007AB5A5 /* HechengViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D837222C1E9E12E8007AB5A5 /* HechengViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1705,6 +1708,11 @@
 		97E7F8151E9D0DF70057971B /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 		97E7F8171E9D0DFF0057971B /* libz.1.1.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.1.3.tbd; path = usr/lib/libz.1.1.3.tbd; sourceTree = SDKROOT; };
 		97E7F8191E9D0E080057971B /* libz.1.2.5.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.5.tbd; path = usr/lib/libz.1.2.5.tbd; sourceTree = SDKROOT; };
+		D83722221E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KouBeijingSelectVideoViewController.h; sourceTree = "<group>"; };
+		D83722231E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KouBeijingSelectVideoViewController.m; sourceTree = "<group>"; };
+		D83722251E9DBBB8007AB5A5 /* test_264.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test_264.mp4; sourceTree = "<group>"; };
+		D837222B1E9E12E8007AB5A5 /* HechengViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HechengViewController.h; sourceTree = "<group>"; };
+		D837222C1E9E12E8007AB5A5 /* HechengViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HechengViewController.m; sourceTree = "<group>"; };
 		E2BAAEC608F7BF7079746554 /* Pods-videoshow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-videoshow.release.xcconfig"; path = "Pods/Target Support Files/Pods-videoshow/Pods-videoshow.release.xcconfig"; sourceTree = "<group>"; };
 		FAF2DFA39420A9E3612F5DE0 /* Pods-videoshow.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-videoshow.debug.xcconfig"; path = "Pods/Target Support Files/Pods-videoshow/Pods-videoshow.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1777,6 +1785,7 @@
 		4C711E8C1E63FAE50059A6AD /* videoshow */ = {
 			isa = PBXGroup;
 			children = (
+				D83722191E9DB899007AB5A5 /* 抠背景 */,
 				97E7F5F41E9D07D10057971B /* 分段拍摄 */,
 				8E05D4FE1E725F0A007F4637 /* videoshow.entitlements */,
 				8E4EBB811E65500900381800 /* AppManager(应用设置) */,
@@ -4252,6 +4261,18 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		D83722191E9DB899007AB5A5 /* 抠背景 */ = {
+			isa = PBXGroup;
+			children = (
+				D83722251E9DBBB8007AB5A5 /* test_264.mp4 */,
+				D83722221E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.h */,
+				D83722231E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.m */,
+				D837222B1E9E12E8007AB5A5 /* HechengViewController.h */,
+				D837222C1E9E12E8007AB5A5 /* HechengViewController.m */,
+			);
+			name = "抠背景";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -4287,7 +4308,7 @@
 				TargetAttributes = {
 					4C711E891E63FAE50059A6AD = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = RP95WRLXM2;
+						DevelopmentTeam = 4225KQ7WC5;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Push = {
@@ -4395,6 +4416,7 @@
 				4C711E9D1E63FAE50059A6AD /* LaunchScreen.storyboard in Resources */,
 				97E7F5F21E9D07B40057971B /* MusicAssets.zip in Resources */,
 				8E9E6AD31E9993E300EE378F /* play@2x.png in Resources */,
+				D83722261E9DBBB8007AB5A5 /* test_264.mp4 in Resources */,
 				8E9E6ACE1E9993E300EE378F /* big@2x.png in Resources */,
 				97E7F5E71E9D07B40057971B /* black.mp4 in Resources */,
 				8E05D44E1E6D1551007F4637 /* lz_MyPrivilegeViewController.xib in Resources */,
@@ -4554,6 +4576,7 @@
 				8E2169321E7A851200879F5F /* NSObject+MTLComparisonAdditions.m in Sources */,
 				97E7F7101E9D08FE0057971B /* NSManagedObject+MagicalFinders.m in Sources */,
 				8E4EBB521E64164000381800 /* UIViewController+viewDidLoad.m in Sources */,
+				D83722241E9DB8DE007AB5A5 /* KouBeijingSelectVideoViewController.m in Sources */,
 				97E7F6A91E9D086C0057971B /* Topic.m in Sources */,
 				8E4EBB9A1E66734A00381800 /* VS_AlertVC_Logout.m in Sources */,
 				97E7F61C1E9D083B0057971B /* BabyPermissionsManager.m in Sources */,
@@ -4597,6 +4620,7 @@
 				8E4EBB9D1E667A9300381800 /* VedioDetailCell.m in Sources */,
 				97E7F6951E9D086C0057971B /* MentionTips.m in Sources */,
 				97E7F71A1E9D08FE0057971B /* NSObject+MagicalDataImport.m in Sources */,
+				D837222D1E9E12E8007AB5A5 /* HechengViewController.m in Sources */,
 				97E7F70C1E9D08FE0057971B /* NSAttributeDescription+MagicalDataImport.m in Sources */,
 				8E9E6AA71E97C57300EE378F /* JPVideoPlayerManager.m in Sources */,
 				8EC48E891E76615F00E3DF39 /* LZ_TestTableViewCell.m in Sources */,
@@ -4813,6 +4837,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -4860,6 +4885,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -4885,7 +4911,7 @@
 				CODE_SIGN_ENTITLEMENTS = videoshow/videoshow.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4225KQ7WC5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IJKMediaPlayer/build/Debug-iphoneos",
@@ -4903,7 +4929,7 @@
 					"$(PROJECT_DIR)/Pods/UMengUShare/UShareSDK/SocialLibraries/QQ",
 					"$(PROJECT_DIR)/videoshow/UMessage_Sdk_1.5.0a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapboo.videoshow;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.xxvideo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4918,7 +4944,7 @@
 				CODE_SIGN_ENTITLEMENTS = videoshow/videoshow.entitlements;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4225KQ7WC5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IJKMediaPlayer/build/Debug-iphoneos",
@@ -4936,7 +4962,7 @@
 					"$(PROJECT_DIR)/Pods/UMengUShare/UShareSDK/SocialLibraries/QQ",
 					"$(PROJECT_DIR)/videoshow/UMessage_Sdk_1.5.0a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapboo.videoshow;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.xxvideo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

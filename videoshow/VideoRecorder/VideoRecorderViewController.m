@@ -644,7 +644,7 @@
     videoImportVc.tag = _tag;
     videoImportVc.tag_id = _tag_id;
     videoImportVc.videoPath = filePath;
-    videoImportVc.onPublish = ^() {
+    videoImportVc.onPublish = ^(NSString * filePath) {
         [self stopPipelineAndDismiss];
     };
     [self.navigationController pushViewController:videoImportVc animated:YES];

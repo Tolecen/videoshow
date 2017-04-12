@@ -15,6 +15,8 @@
 
 @property(nonatomic, strong) NSURL *videoPath;
 
-@property(nonatomic, copy) void(^onPublish) ();
+@property (nonatomic,assign)NSInteger fromWhich;
+
+@property(nonatomic, copy) void(^onPublish) (NSString * filePath);
 
 @end

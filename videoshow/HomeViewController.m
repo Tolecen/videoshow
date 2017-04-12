@@ -19,6 +19,8 @@
 #import "LoginModel.h"
 #import "VideoRecorderViewController.h"
 
+#import "KouBeijingSelectVideoViewController.h"
+
 @interface HomeViewController ()
 
 @end
@@ -134,11 +136,15 @@
         return;
     }
     //拉起支付平台
-    [lz_VideoTemplateModel requestTemplateChargeWithTemplateID:[NSNumber numberWithInteger:101] pay_type:@"wxpay" SuccessHandle:^(id responseObject) {
-        
-    } FailureHandle:^(NSError *error) {
-        
-    }];
+//    [lz_VideoTemplateModel requestTemplateChargeWithTemplateID:[NSNumber numberWithInteger:101] pay_type:@"wxpay" SuccessHandle:^(id responseObject) {
+//        
+//    } FailureHandle:^(NSError *error) {
+//        
+//    }];
+//    
+    
+    KouBeijingSelectVideoViewController *camera = [[KouBeijingSelectVideoViewController alloc] init];
+    [self.navigationController pushViewController:camera animated:YES];
 }
 - (IBAction)Action_3:(id)sender {
     
