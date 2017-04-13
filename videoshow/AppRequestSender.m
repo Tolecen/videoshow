@@ -272,6 +272,78 @@ static  AppRequestSender *RequestSender;
 }
 
 
+
+- (void) uploadVideoWithURLString:(NSString *)URLString
+                      parameters:(NSDictionary *)parameters
+                       videoPath:(NSString *)videoPath
+                        fileName:(NSString *)fileName
+                            name:(NSString *)name
+                        mimeType:(NSString *)mimeType
+                   successHandle:(SuccessHandle)success
+                   failureHandle:(FailureHandle)failure
+                  progressHandle:(ProgressHandle)progress1;
+
+{
+    NSData * videoData = [NSData dataWithContentsOfFile:videoPath];
+    //设置默认签名 默认令牌 默认时间戳
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:parameters];
+    [dict setValue:[NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
+    [dict setValue:[AppDataManager defaultManager].identifier forKey:@"token"];
+    [dict setValue:Sign_Salt forKey:@"key"];
+    [dict setValue:@"custom_video" forKey:@"type"];
+    dict = [self paramerOfSign:dict withMethod:@"POST" withUrlString:URLString];
+    
+    URLString = [URLManager requestURLGenerateWithURL:URLString];
+    URLString = [URLString stringByRemovingPercentEncoding];
+    
+    if (!fileName) {
+        fileName = [NSString stringWithFormat:@"uploadFenduanVideo%@.mp4",[dict valueForKey:@"timestamp"]];
+    }
+    if (!name) {
+        name = @"video";
+    }
+    if (!mimeType) {
+        mimeType = @"mp4";
+    }
+    
+    AFHTTPSessionManager *httpManager = [AFHTTPSessionManager manager];
+    httpManager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    httpManager.requestSerializer.timeoutInterval = 60;
+    //    httpManager.responseSerializer.acceptableContentTypes = [httpManager.responseSerializer.acceptableContentTypes setByAddingObject:@""];
+    [httpManager POST:URLString parameters:dict constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        
+        [formData appendPartWithFileData:videoData name:@"file" fileName:fileName mimeType:mimeType];
+        
+        NSLog(@">>>>> path: %@\nparam:%@\nname:%@\nfileName:%@\nmimeType:%@", URLString, dict, name, fileName, mimeType);
+        
+    } progress:^(NSProgress * _Nonnull uploadProgress) {
+        
+        progress1(uploadProgress);
+        //        NSLog(@"大小 = %lld,当前 = %lld",uploadProgress.totalUnitCount,uploadProgress.completedUnitCount);
+        
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        
+        NSError *jsonError;
+        NSDictionary *result = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&jsonError];
+        
+        if (jsonError) {
+            
+            NSLog(@"转码失败 jsonError = %@",jsonError);
+            success(@{@"data":@""});
+            
+        }else {
+            NSLog(@"result = %@ >>>>>> %@",result,@"上传成功");
+            success(result);
+        }
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        NSLog(@"error = %@",error);
+        failure(error);
+    }];
+}
+
+
+
 //加密部分
 - (NSString *) signStringOfParam:(NSDictionary *)param withMethod:(NSString *)method withUrlString:(NSString *)urlstring
 {

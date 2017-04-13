@@ -21,6 +21,8 @@
 #import "ThemeStoreViewController.h"
 #import "BabyNavigationController.h"
 #import "UIView+SDAutoLayout.h"
+#import "VS_Choose_AlertView.h"
+#import "lz_VideoTemplateModel.h"
 
 #define THEME_ENABLE_MAX 20*1000
 
@@ -40,6 +42,8 @@
 @property (nonatomic, assign) BOOL mStartEncoding;
 
 @property (strong, nonatomic) UIButton *closeButton;
+
+@property (strong, nonatomic) NSArray * watermarkArray;
 
 /**
  * 导演签名
@@ -145,6 +149,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.watermarkArray = [NSArray array];
 //    self.view.backgroundColor = UIColorFromRGB(BABYCOLOR_bg_publish);
     self.view.backgroundColor = [UIColor whiteColor];
 
@@ -442,10 +447,32 @@
 {
     
     
+    //弹出水印选项弹窗
+//    VS_Choose_AlertView *vc = [[VS_Choose_AlertView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+//    [vc setTitles:@[@"文字水印",@"图片水印"]];
+//    vc.block = ^(WaterMarkType WaterMarkType){
+//        
+//        if (WaterMarkType == WaterMarkType_TextWaterMark) {//如果去水印
+//            
+//           
+//        }else if (WaterMarkType == WaterMarkType_PicWaterMark) {//不去水印
+//            
+//            
+//        }else{}
+//    };
+//    [vc show];
     
+    [self getShuiYinList];
     
-    
-    
+}
+
+-(void)getShuiYinList
+{
+    [lz_VideoTemplateModel requestUserWaterListWithPage:0 length:0 SuccessHandle:^(id responseObject) {
+        
+    } FailureHandle:^(NSError *error) {
+        
+    }];
 }
 - (void)initVideoThemes
 {
@@ -576,35 +603,38 @@
         [mutableArray addObject:_mVideoTempPath];
         
         
-        if (_outputHeight==480) {
-            [mutableArray addObject:@"-itsoffset"];
-            [mutableArray addObject:[NSString stringWithFormat:@"%d",(videoTime - 2)]];
+//        if (_outputHeight==480) {
+//            [mutableArray addObject:@"-itsoffset"];
+//            [mutableArray addObject:[NSString stringWithFormat:@"%d",(videoTime - 2)]];
+//            [mutableArray addObject:@"-i"];
+//            [mutableArray addObject:[_mThemeCommonPath stringByAppendingPathComponent:@"tail.mp4"]];
+//        }
+//
+//        
+//        
+//        [mutableArray addObject:@"-i"];
+//        [mutableArray addObject:_mAuthorBitmapPath];
+        
+        
+//        if (_outputHeight==480) {
+//            if (_themeType == BABYVIDEO_FILTER || [StringUtils isEmpty:_mCurrentMVPath]) {
+//                _mCurrentMVPath = [_mThemeCommonPath stringByAppendingPathComponent:@"black.mp4"];
+//            }
+//            [mutableArray addObject:@"-itsoffset"];
+//            [mutableArray addObject:@"0"];
+//            [mutableArray addObject:@"-i"];
+//            [mutableArray addObject:_mCurrentMVPath];
+//        }
+        
+        
+        if (self.isCircle) {
+            NSString * overlayPath = [[[[BabyFileManager manager] themeDir] stringByAppendingPathComponent:@"Common"]stringByAppendingPathComponent:@"frame_overlay_black.png"];
+            //        UIImage * image = [UIImage imageWithContentsOfFile:overlayPath];
+            
             [mutableArray addObject:@"-i"];
-            [mutableArray addObject:[_mThemeCommonPath stringByAppendingPathComponent:@"tail.mp4"]];
+            [mutableArray addObject:overlayPath];
         }
-
-        
-        
-        [mutableArray addObject:@"-i"];
-        [mutableArray addObject:_mAuthorBitmapPath];
-        
-        
-        if (_outputHeight==480) {
-            if (_themeType == BABYVIDEO_FILTER || [StringUtils isEmpty:_mCurrentMVPath]) {
-                _mCurrentMVPath = [_mThemeCommonPath stringByAppendingPathComponent:@"black.mp4"];
-            }
-            [mutableArray addObject:@"-itsoffset"];
-            [mutableArray addObject:@"0"];
-            [mutableArray addObject:@"-i"];
-            [mutableArray addObject:_mCurrentMVPath];
-        }
-        
-        
-        NSString * overlayPath = [[[[BabyFileManager manager] themeDir] stringByAppendingPathComponent:@"Common"]stringByAppendingPathComponent:@"frame_overlay_black.png"];
-//        UIImage * image = [UIImage imageWithContentsOfFile:overlayPath];
-
-        [mutableArray addObject:@"-i"];
-        [mutableArray addObject:overlayPath];
+       
         
         
         

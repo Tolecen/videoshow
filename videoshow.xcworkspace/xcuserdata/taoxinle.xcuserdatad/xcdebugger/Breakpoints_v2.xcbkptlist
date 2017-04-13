@@ -9,12 +9,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "videoshow/VideoPublish/VideoPublishViewController.m"
-            timestampString = "513654797.136392"
+            filePath = "videoshow/KouBeijingSelectVideoViewController.m"
+            timestampString = "513676569.183375"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "174"
-            endingLineNumber = "174"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
             landmarkName = "-viewDidLoad"
             landmarkType = "7">
          </BreakpointContent>
@@ -25,13 +25,29 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "videoshow/KouBeijingSelectVideoViewController.m"
-            timestampString = "513676569.183375"
+            filePath = "videoshow/VideoPublish/VideoPublishViewController.m"
+            timestampString = "513747303.12414"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
-            landmarkName = "-viewDidLoad"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
+            landmarkName = "-savedButton"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "videoshow/VideoPublish/VideoPublishViewController.m"
+            timestampString = "513756286.134113"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "880"
+            endingLineNumber = "880"
+            landmarkName = "-shareVideo"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

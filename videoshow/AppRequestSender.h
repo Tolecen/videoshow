@@ -39,4 +39,14 @@ typedef NS_ENUM(NSUInteger ,HTTP_Method)
                    failureHandle:(FailureHandle)failure
                   progressHandle:(ProgressHandle)progress1;
 
+- (void) uploadVideoWithURLString:(NSString *)URLString
+                       parameters:(NSDictionary *)parameters
+                        videoPath:(NSString *)videoPath
+                         fileName:(NSString *)fileName
+                             name:(NSString *)name
+                         mimeType:(NSString *)mimeType
+                    successHandle:(SuccessHandle)success
+                    failureHandle:(FailureHandle)failure
+                   progressHandle:(ProgressHandle)progress1;
+
 @end

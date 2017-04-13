@@ -196,16 +196,15 @@
                         SuccessHandle:(SuccessHandle)SuccessHandle
                         FailureHandle:(FailureHandle)FailureHandle;
 {
-    NSDictionary *param = @{@"page":page,
-                            @"length":length};
+    NSDictionary *param = @{};
     
     [[AppRequestSender shareRequestSender] requestMethod:GET
                                                URLString:kURLStringMyWatermarkList
                                               parameters:param
                                            successHandle:^(id responseObject) {
-                                               
+                                               SuccessHandle(responseObject[@"data"]);
                                            } failureHandle:^(NSError *error) {
-                                               
+                                               FailureHandle(error);
                                            }];
 }
 

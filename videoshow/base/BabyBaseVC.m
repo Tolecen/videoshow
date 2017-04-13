@@ -785,4 +785,35 @@
     }
 }
 
+- (void) HudShowProgress:(CGFloat)progress status:(NSString *)status;
+{
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeClear];
+    [SVProgressHUD setMinimumSize:CGSizeMake(100, 100)];
+    [SVProgressHUD showProgress:progress status:status];
+}
+
+- (void) HudShowWithStatus:(NSString*)status;
+{
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeNone];
+    [SVProgressHUD setMinimumSize:CGSizeMake(100, 100)];
+    [SVProgressHUD showWithStatus:status];
+    
+    [SVProgressHUD dismissWithDelay:1.5];
+}
+- (void) HudHide;
+{
+    [SVProgressHUD dismiss];
+}
+
+- (void) HudShowWithStatus:(NSString *)status Delay:(CGFloat)delay;
+{
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeClear];
+    [SVProgressHUD setMinimumSize:CGSizeMake(100, 100)];
+    [SVProgressHUD showWithStatus:status];
+    
+    [SVProgressHUD dismissWithDelay:delay];
+}
+
+
+
 @end

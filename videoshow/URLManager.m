@@ -36,7 +36,7 @@ NSString *const kURLStringTemplateUploadImage       = @"/v1/user/upload";//上�
 NSString *const kURLStringMyCollectionList          = @"/v1/user/collections";//我的收藏列表
 NSString *const kURLStringCollectionTemplate        = @"/v1/user/collection";//收藏模板功能 取消收藏
 
-NSString *const kURLStringMyWatermarkList           = @"/v1/user/watermarks";//用户水印列表
+NSString *const kURLStringMyWatermarkList           = @"/v1/user/watermark";//用户水印列表
 NSString *const kURLStringWatermarkUploadOrDelete   = @"/v1/user/watermark";//用户水印上传 删除
 
 NSString *const kURLStringMyWorkList                = @"/v1/user/works";//我的作品列表

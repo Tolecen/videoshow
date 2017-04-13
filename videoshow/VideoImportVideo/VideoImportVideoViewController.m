@@ -372,7 +372,7 @@
                 //回调或者说是通知主线程刷新，
                 [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                 [SVProgressHUD setDefaultStyle:SVProgressHUDStyleDark];
-                [SVProgressHUD showProgress:progress status:@"生成视频中"];
+                [SVProgressHUD showProgress:progress status:@"截取视频中"];
                 
             });
         };

@@ -22,7 +22,9 @@
 #import "BabyNavigationController.h"
 //#import "BoardsViewController.h"
 #import "BabyPinUpload.h"
-
+#import "AppRequestSender.h"
+#import "BaseShareViewController.h"
+#import "BabyMediaControl.h"
 
 //#import "PublishLocationViewController.h"
 //#import "PublishTitlePageViewController.h"
@@ -36,6 +38,9 @@
 
 @property (nonatomic, assign) BOOL isDraft;
 @property (nonatomic, strong) UIButton *rightButton;
+
+//@property (nonatomic,strong)BOOL uploaded;
+@property (nonatomic,strong)NSString * uploadedUrl;
 
 @property (nonatomic, strong) UIImageView *topImage;
 @property (nonatomic, strong) UIImageView *smallImageInScroll;
@@ -77,6 +82,8 @@
 @property (nonatomic, strong) NSString *poi;
 
 @property (nonatomic, strong) UIActionSheet *locationSheet;
+
+@property(nonatomic, strong) BabyMediaControl *mediaControl;
 
 //@property (nonatomic, strong) AMapLocationManager *locationManager;
 
@@ -121,7 +128,7 @@
     UIButton *publishButtonShare = [[UIButton alloc]initWithFrame:CGRectMake(0, (SCREEN_HEIGHT - NavigationBar_HEIGHT), SCREEN_WIDTH, NavigationBar_HEIGHT)];
     
     publishButtonShare.titleLabel.font = kFontSize(18);
-    [publishButtonShare addTarget:self action:@selector(savedButton) forControlEvents:UIControlEventTouchUpInside];
+    [publishButtonShare addTarget:self action:@selector(shareVideo) forControlEvents:UIControlEventTouchUpInside];
     [publishButtonShare setBackgroundImage:ImageNamed(@"sharepublish") forState:UIControlStateNormal];
     [self.view addSubview:publishButtonShare];
     
@@ -170,7 +177,7 @@
     IJKFFOptions *options = [IJKFFOptions optionsByDefault];
 
     
-    self.player = [[IJKFFMoviePlayerController alloc] initWithContentURL:urlMovie withFilters:self.videoFilter withOptions:options];
+    self.player = [[IJKFFMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:_mVideoTempPath] withFilters:self.videoFilter withOptions:options];
     self.player.view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
     self.player.view.frame = CGRectMake(0, NavigationBar_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH);
     self.player.scalingMode = IJKMPMovieScalingModeAspectFit;
@@ -190,6 +197,15 @@
     
 
     [self installMovieNotificationObservers];
+    
+    
+    self.mediaControl = [[BabyMediaControl alloc]initWithFrame:CGRectMake(0, NavigationBar_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH)];
+    [self.mediaControl showLoading:NO];
+    [self.view addSubview:self.mediaControl];
+    
+    self.mediaControl.delegatePlayer = self.player;
+    [self.mediaControl hideAndRefresh];
+
 
 
 }
@@ -823,23 +839,91 @@
 - (void)pressPublishButton
 {
     DLog(@"pressPublishButton");
+//    
+//    if (_publish_board_id == 0) {
+//        [SVProgressHUD showErrorWithStatus:@"请选择一个影集~"];
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [SVProgressHUD dismiss];
+//        });
+//        return;
+//    }
+//    [self saveDraft:0];
     
-    if (_publish_board_id == 0) {
-        [SVProgressHUD showErrorWithStatus:@"请选择一个影集~"];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
-        return;
-    }
-    [self saveDraft:0];
+    
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    // Request to save the image to camera roll
+    
+    
+
+    [library writeVideoAtPathToSavedPhotosAlbum:[NSURL URLWithString:[[[BabyFileManager manager] themeDir] stringByAppendingString:[self.mMediaObject.mOutputVideoPath lastPathComponent]]] completionBlock:^(NSURL *assetURL, NSError *error) {
+        if (!error) {
+            [SVProgressHUD showSuccessWithStatus:@"保存成功"];
+        } else {
+            [SVProgressHUD showErrorWithStatus:@"保存失败"];
+        }
+    }];
     
 }
+
+-(void)shareVideo
+{
+    __weak __typeof(self) weakSelf = self;
+    if (self.uploadedUrl) {
+        [self showShareView];
+        return;
+    }
+    NSDictionary *dict = @{};
+    [[AppRequestSender shareRequestSender] uploadVideoWithURLString:kURLStringTemplateUploadImage parameters:dict videoPath:_mVideoTempPath fileName:nil name:@"" mimeType:@"mp4" successHandle:^(id responseObject) {
+        NSLog(@"uoloadedInfo:%@",responseObject);
+        weakSelf.uploadedUrl = [[responseObject objectForKey:@"data"] objectForKey:@"file"];
+        weakSelf.uploadedUrl = [weakSelf.uploadedUrl stringByReplacingOccurrencesOfString:@"\\" withString:@""];
+        [SVProgressHUD showSuccessWithStatus:@"上传成功"];
+        [weakSelf showShareView];
+    } failureHandle:^(NSError *error) {
+        [SVProgressHUD showErrorWithStatus:@"上传失败"];
+    } progressHandle:^(NSProgress *progress) {
+        NSString *num_Str_1 = [NSString stringWithFormat:@"%.2lld",progress.completedUnitCount];
+        NSString *num_Str_2 = [NSString stringWithFormat:@"%.2lld",progress.totalUnitCount];
+        NSString *numStr = [NSString stringWithFormat:@"%.2f",num_Str_1.floatValue/num_Str_2.floatValue];
+        //                                                NSLog(@"numStr = %@",numStr);
+        [self HudShowProgress:(numStr.floatValue) status:[NSString stringWithFormat:@"正在上传%.0f%%",numStr.floatValue*100]];
+    }];
+}
+
+- (void) showShareView
+{
+    NSString *shareTitle             = @"小视秀 xxx";
+    
+    NSString *shareText              = @"点我进入小视秀";
+    
+    NSString *shareUrl               = @"http://www.baidu.com";
+    
+    //创建分享消息对象
+    UMSocialMessageObject *messageObject = [UMSocialMessageObject messageObject];
+    
+    //创建网页内容对象
+    //    UMShareWebpageObject *shareObject = [UMShareWebpageObject shareObjectWithTitle:@"分享标题" descr:@"分享内容描述" thumImage:[UIImage imageNamed:@"icon"]];
+    NSString* thumbURL =  @"http://m.ayilaile.com/ayapp/ad/1/img/img_logo.png";
+    
+    UMShareWebpageObject *shareObject = [UMShareWebpageObject shareObjectWithTitle:shareTitle descr:shareText thumImage:thumbURL];
+    //设置网页地址
+    shareObject.webpageUrl = shareUrl;
+    
+    //分享消息对象设置分享内容对象
+    messageObject.shareObject = shareObject;
+    
+    BaseShareViewController *vc = [[BaseShareViewController alloc] init];
+    vc.messageObject = messageObject;
+    
+    [vc showWithViewController:self];
+}
+
 
 - (void)saveDraft:(int)is_draft
 {
 //    [self updateAtAllUsers];
 //    _publish_raw_text = self.textView.text;
-//    
+//
 //    _uploadEntity.file_image_path = _mCoverPath;
 //    _uploadEntity.file_time = [NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970]];
 //    _uploadEntity.board_id = [NSNumber numberWithLong:_publish_board_id];

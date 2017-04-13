@@ -47,4 +47,7 @@
 @property(nonatomic, strong)UserInfomation *loginUserInfomation;
 @property(nonatomic, assign)BOOL isNetworkWAN;
 
+- (void) HudShowProgress:(CGFloat)progress status:(NSString *)status;
+-(void)HudShowWithStatus:(NSString*)status;
+
 @end
