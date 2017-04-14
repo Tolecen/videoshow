@@ -45,6 +45,7 @@ typedef void (^OnDeleteCompletionBlock)(BOOL contextDidSave);
  *  @return 保存位置
  */
 - (NSString *)updateVideoAuthorLogo:(UIImage *)image;
+-(NSString*)updateWatermarkWithType:(NSString *)type image:(UIImage *)image;
 
 /**
  *  保存图片（jpg）

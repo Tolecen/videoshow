@@ -750,7 +750,7 @@
 - (void)startNetworkReachability
 {
     _reachabilityMannger =   [AFNetworkReachabilityManager sharedManager];
-    
+    __weak __typeof__(self) weakSelf = self;
     [_reachabilityMannger setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         NSString *result = @"";
         switch (status) {
@@ -762,11 +762,11 @@
                 break;
             case AFNetworkReachabilityStatusReachableViaWWAN:
                 result = @"WAN";
-                _isNetworkWAN = YES;
+                weakSelf.isNetworkWAN = YES;
                 break;
             case AFNetworkReachabilityStatusReachableViaWiFi:
                 result = @"WIFI";
-                _isNetworkWAN = NO;
+                weakSelf.isNetworkWAN = NO;
                 break;
                 
             default:

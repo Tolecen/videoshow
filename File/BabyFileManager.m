@@ -105,6 +105,19 @@
     return authorPath;
 }
 
+-(NSString*)updateWatermarkWithType:(NSString *)type image:(UIImage *)image
+{
+    NSString *authorPath = [[self themeDir] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png",type]];
+    
+    NSFileManager *file_manager = [NSFileManager defaultManager];
+    if ([file_manager fileExistsAtPath:authorPath]) {
+        [file_manager removeItemAtPath:authorPath error:nil];
+    }
+    
+    [UIImagePNGRepresentation(image) writeToFile:authorPath atomically:YES];
+    return authorPath;
+}
+
 - (NSString *)saveUIImageToPath:(NSString *)filePath withImage:(UIImage *)image
 {
     NSFileManager *file_manager = [NSFileManager defaultManager];

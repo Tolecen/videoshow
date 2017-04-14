@@ -23,6 +23,8 @@
 #import "UIView+SDAutoLayout.h"
 #import "VS_Choose_AlertView.h"
 #import "lz_VideoTemplateModel.h"
+#import "SDWebImageDownloader.h"
+#import "UIImageView+WebCache.h"
 
 #define THEME_ENABLE_MAX 20*1000
 
@@ -43,7 +45,11 @@
 
 @property (strong, nonatomic) UIButton *closeButton;
 
-@property (strong, nonatomic) NSArray * watermarkArray;
+@property (strong, nonatomic) NSDictionary * watermarkDict;
+
+@property (strong,nonatomic)UIImageView * shuiyinImageView;
+
+@property (assign,nonatomic)int videoW;
 
 /**
  * 导演签名
@@ -59,6 +65,7 @@
  * 导演签名位于视频的x位置
  */
 @property (nonatomic, assign) int mAuthorPositionx;
+@property (nonatomic, assign) int mAuthorPositiony;
 
 
 /**
@@ -126,7 +133,11 @@
 {
     return @"编辑视频";
 }
-
+-(void)dealloc
+{
+    [self.player stop];
+    self.player = nil;
+}
 - (instancetype)initWithMediaObject:(MediaObject *)mediaObject
 {
     self = [self init];
@@ -149,7 +160,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.watermarkArray = [NSArray array];
+   
 //    self.view.backgroundColor = UIColorFromRGB(BABYCOLOR_bg_publish);
     self.view.backgroundColor = [UIColor whiteColor];
 
@@ -190,11 +201,12 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    __weak __typeof__(self) weakSelf = self;
     if (_isDownloadTheme) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSUInteger ii[2] = {0, [self.tableView numberOfRowsInSection:0] - 1};
+            NSUInteger ii[2] = {0, [weakSelf.tableView numberOfRowsInSection:0] - 1};
             NSIndexPath* indexPath = [NSIndexPath indexPathWithIndexes:ii length:2];
-            [self.tableView scrollToRowAtIndexPath:indexPath
+            [weakSelf.tableView scrollToRowAtIndexPath:indexPath
                                   atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         });
         _isDownloadTheme = NO;
@@ -262,15 +274,16 @@
 }
 - (void)initUserInfo
 {
-    [super initUserInfo];
-    self.mAuthor = [NSString stringWithFormat:@"%@ 作品",[self loginUserInfomation].info.username];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // 生成签名
-//        UIImage *image = [ImageUtils imageFromText:@[self.mAuthor] withFont:16.0f];
-        UIImage *image = [ImageUtils imageFromTextOriginWith:self.mAuthor withFont:20.0f];
-        _mAuthorBitmapPath = [[BabyFileManager manager] updateVideoAuthorLogo:image];
-        _mAuthorPositionx = ((480 - image.size.width) / 2);
-    });
+//    [super initUserInfo];
+//    self.mAuthor = [NSString stringWithFormat:@"%@ 作品",[self loginUserInfomation].info.username];
+//    __weak __typeof__(self) weakSelf = self;
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//        // 生成签名
+////        UIImage *image = [ImageUtils imageFromText:@[self.mAuthor] withFont:16.0f];
+//        UIImage *image = [ImageUtils imageFromTextOriginWith:weakSelf.mAuthor withFont:20.0f];
+//        weakSelf.mAuthorBitmapPath = [[BabyFileManager manager] updateVideoAuthorLogo:image];
+//        weakSelf.mAuthorPositionx = ((480 - image.size.width) / 2);
+//    });
 }
 
 - (void)initData
@@ -344,6 +357,11 @@
 //    [layerTop setFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width,(640-_outputHeight)/2.0f)];
 //    
     
+    if (self.isCircle) {
+        UIImageView * mask = [[UIImageView alloc] initWithFrame:CGRectMake(0, NavigationBar_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH)];
+        mask.image = [UIImage imageWithContentsOfFile:[[[[BabyFileManager manager] themeDir] stringByAppendingPathComponent:@"Common"]stringByAppendingPathComponent:@"frame_overlay_black.png"]];
+        [self.view addSubview:mask];
+    }
     
     
     self.mediaControl = [[BabyMediaControl alloc]initWithFrame:CGRectMake(0, NavigationBar_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH)];
@@ -354,7 +372,10 @@
     [self.mediaControl hideAndRefresh];
     
     
-    
+    self.shuiyinImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 30, 30)];
+    self.shuiyinImageView.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:self.shuiyinImageView];
+
 
 
 //    layer.hidden = YES;
@@ -445,33 +466,93 @@
 }
 -(void)initShuiYin
 {
-    
-    
-    //弹出水印选项弹窗
-//    VS_Choose_AlertView *vc = [[VS_Choose_AlertView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-//    [vc setTitles:@[@"文字水印",@"图片水印"]];
-//    vc.block = ^(WaterMarkType WaterMarkType){
-//        
-//        if (WaterMarkType == WaterMarkType_TextWaterMark) {//如果去水印
-//            
-//           
-//        }else if (WaterMarkType == WaterMarkType_PicWaterMark) {//不去水印
-//            
-//            
-//        }else{}
-//    };
-//    [vc show];
+
     
     [self getShuiYinList];
     
 }
 
+-(void)showShuiSelectView
+{
+    __weak __typeof__(self) weakSelf = self;
+    VS_Choose_AlertView *vc = [[VS_Choose_AlertView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [vc setTitles:@[@"文字水印",@"图片水印"]];
+    vc.block = ^(WaterMarkType WaterMarkType){
+        
+        if (WaterMarkType == WaterMarkType_TextWaterMark) {//如果去水印
+            NSString * url = [[weakSelf.watermarkDict objectForKey:@"text"] objectForKey:@"watermark_url"];
+            NSInteger p = [[[weakSelf.watermarkDict objectForKey:@"text"] objectForKey:@"position"] integerValue];
+            [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:url] options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+                
+            } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                [weakSelf setWaterMarkWithPosition:p andSize:image.size];
+                weakSelf.shuiyinImageView.image = image;
+                weakSelf.mAuthorBitmapPath = [[BabyFileManager manager] updateWatermarkWithType:@"textwatermark" image:image];
+            }];
+        }else if (WaterMarkType == WaterMarkType_PicWaterMark) {//不去水印
+            
+            NSString * url = [[weakSelf.watermarkDict objectForKey:@"image"] objectForKey:@"watermark_url"];
+            NSInteger p = [[[weakSelf.watermarkDict objectForKey:@"image"] objectForKey:@"position"] integerValue];
+            [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:url] options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+                
+            } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
+                [weakSelf setWaterMarkWithPosition:p andSize:image.size];
+                weakSelf.shuiyinImageView.image = image;
+                weakSelf.mAuthorBitmapPath = [[BabyFileManager manager] updateWatermarkWithType:@"imagewatermark" image:image];
+            }];
+
+        }else{}
+    };
+    [vc show];
+
+}
+
+-(void)setWaterMarkWithPosition:(NSInteger)s andSize:(CGSize)size
+{
+    float ox = 0;
+    float oy = 0;
+    if (_outputHeight>480)
+    {
+        float vw = 480*SCREEN_WIDTH/_outputHeight;
+        ox = (SCREEN_WIDTH-vw)/2;
+    }
+    else if(_outputHeight<480)
+    {
+        float vh = _outputHeight*SCREEN_WIDTH/480;
+        oy = (SCREEN_WIDTH-vh)/2;
+    }
+    if (s==1){
+        self.shuiyinImageView.frame = CGRectMake(SCREEN_WIDTH-size.width-10-ox, 10, size.width, size.height);
+        self.mAuthorPositionx = 480-size.width-10;
+        self.mAuthorPositiony = 10;
+    }
+    else if (s==2){
+        self.shuiyinImageView.frame = CGRectMake(SCREEN_WIDTH-size.width-10-ox, NavigationBar_HEIGHT+(SCREEN_WIDTH-size.height-10-oy), size.width, size.height);
+        self.mAuthorPositionx = 480-size.width-10;
+        self.mAuthorPositiony = _outputHeight-size.height-10;
+    }
+    else if (s==3){
+        self.shuiyinImageView.frame = CGRectMake(10+ox, NavigationBar_HEIGHT+(SCREEN_WIDTH-size.height-10-oy), size.width, size.height);
+        self.mAuthorPositionx = 10;
+        self.mAuthorPositiony = _outputHeight-size.height-10;
+    }
+    else if (s==4){
+        self.shuiyinImageView.frame = CGRectMake(10+ox, 10+oy, size.width, size.height);
+        self.mAuthorPositionx = 10;
+        self.mAuthorPositiony = 10;
+    }
+}
+
 -(void)getShuiYinList
 {
+    [SVProgressHUD showWithStatus:@"获取水印"];
+    __weak __typeof__(self) weakSelf = self;
     [lz_VideoTemplateModel requestUserWaterListWithPage:0 length:0 SuccessHandle:^(id responseObject) {
-        
+        weakSelf.watermarkDict = responseObject;
+        [SVProgressHUD dismiss];
+        [weakSelf showShuiSelectView];
     } FailureHandle:^(NSError *error) {
-        
+        [SVProgressHUD showErrorWithStatus:@"获取水印失败"];
     }];
 }
 - (void)initVideoThemes
@@ -511,40 +592,42 @@
         [_filterArray removeAllObjects];
     }
     
+    __weak __typeof__(self) weakSelf = self;
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // 处理耗时操作的代码块...
         
         NSString *file = [[ThemeHelper helper]prepareTheme];
         
         if (![StringUtils isEmpty:file]) {
-            _themeArray = [[ThemeHelper helper] parseTheme:THEME_MUSIC_VIDEO_ASSETS themeNames:themesIn];
+            weakSelf.themeArray = [[ThemeHelper helper] parseTheme:THEME_MUSIC_VIDEO_ASSETS themeNames:themesIn];
         
         
             NSMutableArray *downloadThemeList = [[ThemeHelper helper] parseTheme:THEME_DOWNLOAD_VIDEO themeNames:nil];
             
-            [_themeArray addObjectsFromArray:downloadThemeList];
+            [weakSelf.themeArray addObjectsFromArray:downloadThemeList];
             
             VideoTheme *storeTheme = [[ThemeHelper helper] loadThemeRes:THEME_STORE themeDisplayName:THEME_STORE_NAME themeIconResource:@"ic_more_mv_normal"];
             if (storeTheme != nil)
-                [_themeArray insertObject:storeTheme atIndex:0];
+                [weakSelf.themeArray insertObject:storeTheme atIndex:0];
             
             VideoTheme *emptyTheme = [[ThemeHelper helper] loadThemeJson:[[[BabyFileManager manager] themeDir] stringByAppendingPathComponent:THEME_EMPTY]];
             if (emptyTheme != nil)
-                [_themeArray insertObject:emptyTheme atIndex:1];
+                [weakSelf.themeArray insertObject:emptyTheme atIndex:1];
         }
-        _filterArray = [[ThemeHelper helper] parseTheme:THEME_FILTER_ASSETS themeNames:filterIn];
+        weakSelf.filterArray = [[ThemeHelper helper] parseTheme:THEME_FILTER_ASSETS themeNames:filterIn];
         
         //通知主线程刷新
         dispatch_async(dispatch_get_main_queue(), ^{
             //回调或者说是通知主线程刷新，
             
             // 默认选中行
-            if (_themeType == BABYVIDEO_THEME) {
-                _selectThemePath = [NSIndexPath indexPathForRow:1 inSection:0];
+            if (weakSelf.themeType == BABYVIDEO_THEME) {
+                weakSelf.selectThemePath = [NSIndexPath indexPathForRow:1 inSection:0];
             } else {
-                _selectFilterPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                weakSelf.selectFilterPath = [NSIndexPath indexPathForRow:0 inSection:0];
             }
-            [self.tableView reloadData];
+            [weakSelf.tableView reloadData];
             
         });
         
@@ -583,14 +666,14 @@
     [SVProgressHUD setDefaultStyle:SVProgressHUDStyleDark];
     [SVProgressHUD showProgress:0 status:@"生成视频中"];
     
-    __block VideoPreviewViewController *blockSelf = self;
+    __weak __typeof__(self) blockSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // 生成视频
-        int videoTime = _mDuration / 1000 + 2;
+        int videoTime = blockSelf.mDuration / 1000 + 2;
         
         NSString *filterTheme = @"";
-        if (![StringUtils isEmpty:_mCurrentFilterPath]) {
-            filterTheme = [NSString stringWithFormat:@"[mv2];[mv2]curves=psfile=%@", _mCurrentFilterPath];
+        if (![StringUtils isEmpty:blockSelf.mCurrentFilterPath]) {
+            filterTheme = [NSString stringWithFormat:@"[mv2];[mv2]curves=psfile=%@", blockSelf.mCurrentFilterPath];
         }
         
         VideoEncoder *encoder = [VideoEncoder videoEncoder];
@@ -600,7 +683,7 @@
         [mutableArray addObject:@"ffmpeg"];
         [mutableArray addObject:@"-y"];
         [mutableArray addObject:@"-i"];
-        [mutableArray addObject:_mVideoTempPath];
+        [mutableArray addObject:blockSelf.mVideoTempPath];
         
         
 //        if (_outputHeight==480) {
@@ -611,9 +694,12 @@
 //        }
 //
 //        
-//        
-//        [mutableArray addObject:@"-i"];
-//        [mutableArray addObject:_mAuthorBitmapPath];
+//
+        if (blockSelf.shuiyinImageView.image) {
+            [mutableArray addObject:@"-i"];
+            [mutableArray addObject:blockSelf.mAuthorBitmapPath];
+        }
+        
         
         
 //        if (_outputHeight==480) {
@@ -627,7 +713,7 @@
 //        }
         
         
-        if (self.isCircle) {
+        if (blockSelf.isCircle) {
             NSString * overlayPath = [[[[BabyFileManager manager] themeDir] stringByAppendingPathComponent:@"Common"]stringByAppendingPathComponent:@"frame_overlay_black.png"];
             //        UIImage * image = [UIImage imageWithContentsOfFile:overlayPath];
             
@@ -642,44 +728,71 @@
         [mutableArray addObject:@"-filter_complex"];
         
         NSString *filter = @"";
-        if (_outputHeight==480) {
-            if (!self.isCircle) {
-                filter = [NSString stringWithFormat:@"[0:v]format=rgb24,setsar=sar=1/1[mv];[3:v]format=rgb24,setsar=sar=1/1[in];[in][mv]blend=all_mode='addition':all_opacity=1,format=rgb24[tmp];[tmp] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[1:v]format=rgb24,setsar=sar=1/1[tail];[mv][tail]blend=all_mode='addition':all_opacity=1,format=rgb24[tmpblur2];[tmpblur2][2:v]overlay=%d:260:enable='between(t,%d,%d)'%@",(videoTime - 2), videoTime, _mAuthorPositionx, (videoTime - 2), videoTime, filterTheme];
+        if (blockSelf.outputHeight==480) {
+            if (!blockSelf.isCircle) {
+//                filter = [NSString stringWithFormat:@"[0:v]format=rgb24,setsar=sar=1/1[mv];[3:v]format=rgb24,setsar=sar=1/1[in];[in][mv]blend=all_mode='addition':all_opacity=1,format=rgb24[tmp];[tmp] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[1:v]format=rgb24,setsar=sar=1/1[tail];[mv][tail]blend=all_mode='addition':all_opacity=1,format=rgb24[tmpblur2];[tmpblur2][2:v]overlay=%d:260:enable='between(t,%d,%d)'%@",(videoTime - 2), videoTime, _mAuthorPositionx, (videoTime - 2), videoTime, filterTheme];
+                if (blockSelf.shuiyinImageView.image) {
+                    filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[mv][1:v] overlay=%d:%d:enable='between(t,%d,%d)'%@",(videoTime - 2), videoTime, blockSelf.mAuthorPositionx,blockSelf.mAuthorPositiony, 0, videoTime, filterTheme];
+                }
+                else
+                {
+                    filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1%@",(videoTime - 2), videoTime, filterTheme];
+                }
+                
             }
             else
             {
-                filter = [NSString stringWithFormat:@"[0:v]format=rgb24,setsar=sar=1/1[mv];[3:v]format=rgb24,setsar=sar=1/1[in];[in][mv]blend=all_mode='addition':all_opacity=1,format=rgb24[tmp];[tmp] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[1:v]format=rgb24,setsar=sar=1/1[tail];[mv][tail]blend=all_mode='addition':all_opacity=1,format=rgb24[tmpblur2];[tmpblur2][2:v]overlay=%d:260:enable='between(t,%d,%d)'[maskcircle];[maskcircle][4:v]overlay=0:0%@",(videoTime - 2), videoTime, _mAuthorPositionx, (videoTime - 2), videoTime,filterTheme];
+//                filter = [NSString stringWithFormat:@"[0:v]format=rgb24,setsar=sar=1/1[mv];[3:v]format=rgb24,setsar=sar=1/1[in];[in][mv]blend=all_mode='addition':all_opacity=1,format=rgb24[tmp];[tmp] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[1:v]format=rgb24,setsar=sar=1/1[tail];[mv][tail]blend=all_mode='addition':all_opacity=1,format=rgb24[tmpblur2];[tmpblur2][2:v]overlay=%d:260:enable='between(t,%d,%d)'[maskcircle];[maskcircle][4:v]overlay=0:0%@",(videoTime - 2), videoTime, _mAuthorPositionx, (videoTime - 2), videoTime,filterTheme];
+                
+//                 filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[mv][1:v] overlay=%d:260:enable='between(t,%d,%d)'[maskcircle];[maskcircle][2:v]overlay=0:0%@",(videoTime - 2), videoTime, blockSelf.mAuthorPositionx, (videoTime - 2), videoTime, filterTheme];
+                
+                if (blockSelf.shuiyinImageView.image) {
+                    filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[mv][1:v] overlay=%d:%d:enable='between(t,%d,%d)'[maskcircle];[maskcircle][2:v]overlay=0:0%@",(videoTime - 2), videoTime, blockSelf.mAuthorPositionx,blockSelf.mAuthorPositiony, 0, videoTime, filterTheme];
+                }
+                else
+                {
+                    filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[maskcircle];[maskcircle][1:v]overlay=0:0%@",(videoTime - 2), videoTime, filterTheme];
+                }
             }
             
 
         }
         else
         {
-            filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[mv][1:v] overlay=%d:260:enable='between(t,%d,%d)'%@",(videoTime - 2), videoTime, _mAuthorPositionx, (videoTime - 2), videoTime, filterTheme];
+//            filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[mv][1:v] overlay=%d:260:enable='between(t,%d,%d)'%@",(videoTime - 2), videoTime, blockSelf.mAuthorPositionx, (videoTime - 2), videoTime, filterTheme];
+            
+            
+            if (blockSelf.shuiyinImageView.image) {
+                filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1[mv];[mv][1:v] overlay=%d:%d:enable='between(t,%d,%d)'%@",(videoTime - 2), videoTime, blockSelf.mAuthorPositionx,blockSelf.mAuthorPositiony, 0, videoTime, filterTheme];
+            }
+            else
+            {
+                filter = [NSString stringWithFormat:@"[0:v] boxblur=luma_radius=min(h\\,w)/30:luma_power=1:chroma_radius=min(cw\\,ch)/30:chroma_power=1:enable='between(t,%d,%d)'[tmpblur];[tmpblur]format=rgb24,setsar=sar=1/1%@",(videoTime - 2), videoTime, filterTheme];
+            }
         }
         [mutableArray addObject:filter];
         
         NSString *aFilter;
         
-        if (_themeType == BABYVIDEO_THEME) {
+        if (blockSelf.themeType == BABYVIDEO_THEME) {
         
-            if (![StringUtils isEmpty:_mCurrentMusicPath]) {
-                if (_originMusic.tag==2) {
+            if (![StringUtils isEmpty:blockSelf.mCurrentMusicPath]) {
+                if (blockSelf.originMusic.tag==2) {
                     
-                    aFilter = [NSString stringWithFormat:@"amovie=%@[audio];[in]volume=0.0[in];[in][audio]amix=inputs=2:duration=shortest:dropout_transition=2[temp];[temp]volume='if(lt(t,%d),1,max(1-(t-%d)/1,0))':eval=frame", _mCurrentMusicPath, (videoTime - 2), (videoTime - 2)];
+                    aFilter = [NSString stringWithFormat:@"amovie=%@[audio];[in]volume=0.0[in];[in][audio]amix=inputs=2:duration=shortest:dropout_transition=2[temp];[temp]volume='if(lt(t,%d),1,max(1-(t-%d)/1,0))':eval=frame", blockSelf.mCurrentMusicPath, (videoTime - 2), (videoTime - 2)];
                     
                 } else {
-                    aFilter = [NSString stringWithFormat:@"amovie=%@[audio];[in][audio]amix=inputs=2:duration=shortest:dropout_transition=2[temp];[temp]volume='if(lt(t,%d),1,max(1-(t-%d)/1,0))':eval=frame", _mCurrentMusicPath, (videoTime - 2), (videoTime - 2)];
+                    aFilter = [NSString stringWithFormat:@"amovie=%@[audio];[in][audio]amix=inputs=2:duration=shortest:dropout_transition=2[temp];[temp]volume='if(lt(t,%d),1,max(1-(t-%d)/1,0))':eval=frame", blockSelf.mCurrentMusicPath, (videoTime - 2), (videoTime - 2)];
                 }
-            } else if (_originMusic.tag==2) {
-                aFilter = @"[in]volume=0.0[in]";
+            } else if (blockSelf.originMusic.tag==2) {
+                aFilter = @"[in]volume=0.0";
             } else {
                 aFilter = [NSString stringWithFormat:@"[in]volume='if(lt(t,%d),1,max(1-(t-%d)/1,0))':eval=frame", (videoTime - 2), (videoTime - 2)];
             }
             
         } else {
-            if (_originMusic.tag==2) {
-                aFilter = @"[in]volume=0.0[in]";
+            if (blockSelf.originMusic.tag==2) {
+                aFilter = @"[in]volume=0.0";
             } else {
                 aFilter = [NSString stringWithFormat:@"[in]volume='if(lt(t,%d),1,max(1-(t-%d)/1,0))':eval=frame", (videoTime - 2), (videoTime - 2)];
             }
@@ -705,7 +818,7 @@
         [mutableArray addObject:@"aac_adtstoasc"];
         [mutableArray addObject:@"-movflags"];
         [mutableArray addObject:@"+faststart"];
-        [mutableArray addObject:_mVideoPath];
+        [mutableArray addObject:blockSelf.mVideoPath];
         
         
         NSArray *array =[mutableArray copy];
@@ -821,18 +934,18 @@
     publishVC.videoFilter = self.videoFilter;
     publishVC.mVideoTempPath = _mVideoPath;
     
-    
+    __weak __typeof__(self) weakSelf = self;
     publishVC.savedDraft = ^(BOOL saved) {
-        if (self.savedDraft) {
-            self.savedDraft(saved);
+        if (weakSelf.savedDraft) {
+            weakSelf.savedDraft(saved);
         }
     };
     
     publishVC.onPublish = ^() {
-        if (self.onPublish) {
-            self.onPublish();
+        if (weakSelf.onPublish) {
+            weakSelf.onPublish();
         }
-        [self.navigationController popViewControllerAnimated:YES];
+        [weakSelf.navigationController popViewControllerAnimated:YES];
     };
     
     [self.navigationController pushViewController:publishVC animated:YES];
@@ -1037,15 +1150,15 @@
     {
         
     }
-    
+    __weak __typeof__(self) weakSelf = self;
     if ([theme.themeName isEqualToString:THEME_STORE]) {
         DLog(@"去商店");
         [self.player pause];
         ThemeStoreViewController *themeVC = [[ThemeStoreViewController alloc]init];
         
         themeVC.onThemeDownload = ^() {
-            _isDownloadTheme = YES;
-            [self loadThemesData];
+            weakSelf.isDownloadTheme = YES;
+            [weakSelf loadThemesData];
         };
         
         BabyNavigationController *themeNav = [[BabyNavigationController alloc]initWithRootViewController:themeVC];
